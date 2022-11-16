@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1423,10 +1423,10 @@ RectTransform:
   m_Father: {fileID: 1398760599}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -255.30725, y: -395.2401}
-  m_SizeDelta: {x: -1493.8253, y: -790.4702}
+  m_SizeDelta: {x: 426.17468, y: 289.5298}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &959066446
 MonoBehaviour:
@@ -2458,8 +2458,9 @@ MonoBehaviour:
     baseDEF: 5
     surDEF: 5
   currentState: 0
-  cur_colldown: 5
+  cur_colldown: 0
   max_colldown: 5
+  HeroToAttAck: {fileID: 0}
 --- !u!1 &1638407566
 GameObject:
   m_ObjectHideFlags: 0
@@ -2650,8 +2651,9 @@ MonoBehaviour:
     baseDEF: 5
     surDEF: 5
   currentState: 0
-  cur_colldown: 5
-  max_colldown: 5
+  cur_colldown: 0
+  max_colldown: 3
+  HeroToAttAck: {fileID: 0}
 --- !u!1 &1698259838
 GameObject:
   m_ObjectHideFlags: 0
@@ -2774,7 +2776,7 @@ MonoBehaviour:
     agility: 10
   currentState: 0
   cur_colldown: 0
-  max_colldown: 5
+  max_colldown: 3
   ProgressBar: {fileID: 1139004671}
 --- !u!1 &1713936855
 GameObject:
@@ -3238,10 +3240,10 @@ RectTransform:
   m_Father: {fileID: 1398760599}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: -501.10812, y: 144.76}
-  m_SizeDelta: {x: -1002.2233, y: 289.53}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -501.10815, y: -395.24}
+  m_SizeDelta: {x: 917.7767, y: 289.53003}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &3033610625976061226
 RectTransform:
@@ -3260,10 +3262,10 @@ RectTransform:
   m_Father: {fileID: 1398760599}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 458.89008, y: 144.76483}
-  m_SizeDelta: {x: -917.78, y: 289.5298}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 458.89008, y: -395.23517}
+  m_SizeDelta: {x: 1002.22, y: 289.5298}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &3068129069969952858
 GameObject:
@@ -3322,9 +3324,9 @@ RectTransform:
   m_Father: {fileID: 1398760599}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -255.30725, y: -790.4752}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: -255.30725, y: -250.47522}
   m_SizeDelta: {x: 426.17468, y: 289.5298}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &6975669105062018035

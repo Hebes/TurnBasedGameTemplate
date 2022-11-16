@@ -3,23 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ÊÖ±ú×ª¶¯
+/// å›åˆå¤„ç†ç±»
 /// </summary>
 [System.Serializable]
 public class HandleTurn
 {
     /// <summary>
-    /// ¹¥»÷ÕßµÄÃû³Æ
+    /// æ”»å‡»è€…çš„åç§°
     /// </summary>
     public string Attacker;
 
     /// <summary>
-    /// ¹¥»÷ÕßµÄÎïÌå
+    /// ç±»å‹
+    /// </summary>
+    public string Type;
+
+    /// <summary>
+    /// æ”»å‡»è€…çš„ç‰©ä½“
     /// </summary>
     public GameObject AttackersGameObject;
 
     /// <summary>
-    /// ¹¥»÷ÕßµÄÄ¿±ê
+    /// æ”»å‡»è€…çš„ç›®æ ‡
     /// </summary>
     public GameObject AttackersTarget;
 }

@@ -137,8 +137,12 @@ public class EnemyStateMaschine : MonoBehaviour
         while (MoveTowrdsStart(firstPosition))//循环等待1帧
             yield return null;//这个是等待1帧的意思
         //从BSM的Performer列表移除
+        BSM.PerformList.RemoveAt(0);
         //重置BSM->等待
+        BSM.battleState = BattleStateMaschine.PerfromAction.WAIT;
+        //结束协程
         actionStarted = false;
+        //重置敌人状态
         cur_colldown = 0f;
         currentState = TurnState.PROCESSING;
     }

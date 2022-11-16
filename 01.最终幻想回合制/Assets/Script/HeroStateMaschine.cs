@@ -8,6 +8,7 @@ using UnityEngine.UI;
 /// </summary>
 public class HeroStateMaschine : MonoBehaviour
 {
+    private BattleStateMaschine BSM;
     public BaseHero baseHero;
 
     public enum TurnState
@@ -49,6 +50,7 @@ public class HeroStateMaschine : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        BSM = GameObject.Find("BattleManager").GetComponent<BattleStateMaschine>();
         currentState = TurnState.PROCESSING;
     }
 
@@ -62,8 +64,11 @@ public class HeroStateMaschine : MonoBehaviour
                 UpgradeProgressBar();
                 break;
             case TurnState.ADDTOLIST:
+                BSM.HeroToManage.Add(this.gameObject);
+                currentState = TurnState.WAITING;
                 break;
             case TurnState.WAITING:
+                //¿ÕÏÐ×´Ì¬
                 break;
             case TurnState.SELECTING:
                 break;

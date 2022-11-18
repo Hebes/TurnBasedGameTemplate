@@ -46,10 +46,20 @@ public class HeroStateMaschine : MonoBehaviour
     /// 冷却版进度条
     /// </summary>
     public Image ProgressBar;
+    public GameObject Selector;
+
+    //英雄回跳
+    public GameObject EnemyToAttack;
+    private bool actionStarted = false;
+    public Vector3 startPosition;
+    private float animSpeed = 10f;
 
     // Start is called before the first frame update
     void Start()
     {
+        startPosition = transform.position;
+        cur_colldown = Random.Range(0, 2.5f);
+        Selector.SetActive(false);
         BSM = GameObject.Find("BattleManager").GetComponent<BattleStateMaschine>();
         currentState = TurnState.PROCESSING;
     }
@@ -73,6 +83,7 @@ public class HeroStateMaschine : MonoBehaviour
             case TurnState.SELECTING:
                 break;
             case TurnState.ACTION:
+                StartCoroutine(TimeForAction());
                 break;
             case TurnState.DEAD:
                 break;
@@ -98,5 +109,61 @@ public class HeroStateMaschine : MonoBehaviour
         {
             currentState = TurnState.ADDTOLIST;
         }
+    }
+
+    /// <summary>
+    /// 行动的时间到了
+    /// </summary>
+    /// <returns></returns>
+    private IEnumerator TimeForAction()
+    {
+        if (actionStarted)
+        {
+            yield break;//如果没到可以行动,直接跳出协程
+        }
+        actionStarted = true;
+        //播放敌人接近英雄的攻击动画
+        Vector3 enemyPostion = new Vector3(
+            EnemyToAttack.transform.position.x + 1.5f,
+            EnemyToAttack.transform.position.y,
+            EnemyToAttack.transform.position.z);
+        while (MoveTowrdsEnemy(enemyPostion))//循环等待1帧
+            yield return null;//这个是等待1帧的意思
+        //等待
+        yield return new WaitForSeconds(0.5f);
+        //伤害
+        //回到起始位置的动画
+        Vector3 firstPosition = startPosition;
+        while (MoveTowrdsStart(firstPosition))//循环等待1帧
+            yield return null;//这个是等待1帧的意思
+        //从BSM的Performer列表移除
+        BSM.PerformList.RemoveAt(0);
+        //重置BSM->等待
+        BSM.battleState = BattleStateMaschine.PerfromAction.WAIT;
+        //结束协程
+        actionStarted = false;
+        //重置敌人状态
+        cur_colldown = 0f;
+        currentState = TurnState.PROCESSING;
+    }
+
+    /// <summary>
+    /// 移动敌人 如果敌人没移动到玩家坐标的时候  返回的就是false
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private bool MoveTowrdsEnemy(Vector3 target)
+    {
+        return target != (transform.position = Vector3.MoveTowards(transform.position, target, animSpeed * Time.deltaTime));
+    }
+
+    /// <summary>
+    /// 回到原来的位置
+    /// </summary>
+    /// <param name="target"></param>
+    /// <returns></returns>
+    private bool MoveTowrdsStart(Vector3 target)
+    {
+        return target != (transform.position = Vector3.MoveTowards(transform.position, target, animSpeed * Time.deltaTime));
     }
 }

@@ -57,7 +57,7 @@ public class BattleStateMaschine : MonoBehaviour
         /// <summary>
         /// 等待
         /// </summary>
-        waiting,
+        WAITING,
         /// <summary>
         /// 输入1
         /// </summary>
@@ -77,14 +77,22 @@ public class BattleStateMaschine : MonoBehaviour
     /// </summary>
     public HeroGUI HeroInput;
 
+    /// <summary>
+    /// 英雄列表的管理
+    /// </summary>
     public List<GameObject> HeroToManage = new List<GameObject>();
     private HandleTurn HeroChoise;
-    public GameObject enemyButton;
 
+    public GameObject enemyButton;
     /// <summary>
     /// 生成敌人按钮的父物体
     /// </summary>
     public Transform Spacer;
+
+    public GameObject AttackPanel;
+    public GameObject EnemySelectPanel;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -92,6 +100,10 @@ public class BattleStateMaschine : MonoBehaviour
         battleState = PerfromAction.WAIT;
         EnemysInBattle.AddRange(GameObject.FindGameObjectsWithTag("Enemy"));
         HerosInBattle.AddRange(GameObject.FindGameObjectsWithTag("Hero"));
+        HeroInput = HeroGUI.ACTIOVATE;
+
+        AttackPanel.SetActive(false);
+        EnemySelectPanel.SetActive(false);
 
         //生成敌人按钮
         EnemyButtons();
@@ -100,6 +112,7 @@ public class BattleStateMaschine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //战斗状态
         switch (battleState)
         {
             case PerfromAction.WAIT:
@@ -108,7 +121,7 @@ public class BattleStateMaschine : MonoBehaviour
                     battleState = PerfromAction.TAKEACTION;
                 }
                 break;
-            case PerfromAction.TAKEACTION:
+            case PerfromAction.TAKEACTION://采取行动
                 GameObject performer = GameObject.Find(PerformList[0].Attacker);
                 if (PerformList[0].Type.Equals("Enemy"))
                 {
@@ -118,11 +131,39 @@ public class BattleStateMaschine : MonoBehaviour
                 }
                 if (PerformList[0].Type.Equals("Hero"))
                 {
-                    //HeroStateMaschine HSM= performer.GetComponent<HeroStateMaschine>();
+                    //Debug.Log("英雄是表演的英雄");
+                    HeroStateMaschine HSM = performer.GetComponent<HeroStateMaschine>();
+                    HSM.EnemyToAttack = PerformList[0].AttackersTarget;
+                    HSM.currentState = HeroStateMaschine.TurnState.ACTION;
                 }
                 battleState = PerfromAction.PERFROMACTION;
                 break;
             case PerfromAction.PERFROMACTION:
+                break;
+            default:
+                break;
+        }
+
+        //英雄输入状态
+        switch (HeroInput)
+        {
+            case HeroGUI.ACTIOVATE:
+                if (HeroToManage.Count > 0)
+                {
+                    HeroToManage[0].transform.Find("Selector").gameObject.SetActive(true);
+                    HeroChoise = new HandleTurn();
+                    AttackPanel.SetActive(true);
+                    HeroInput = HeroGUI.WAITING;
+                }
+                break;
+            case HeroGUI.WAITING:
+                break;
+            case HeroGUI.INPUT1:
+                break;
+            case HeroGUI.INPUT2:
+                break;
+            case HeroGUI.DONE:
+                HeroInputDone();
                 break;
             default:
                 break;
@@ -142,6 +183,7 @@ public class BattleStateMaschine : MonoBehaviour
     /// </summary>
     private void EnemyButtons()
     {
+        //敌人按钮适配Unity 5 Tutorial: Turn Based Battle System #07 - Gui Improvements
         foreach (var enemy in EnemysInBattle)
         {
             GameObject newButton = Instantiate(enemyButton, Spacer) as GameObject;
@@ -151,5 +193,36 @@ public class BattleStateMaschine : MonoBehaviour
             buttontext.text = cur_enemy.enemy.name;
             button.EnemyPrefab = enemy;
         }
+    }
+
+    /// <summary>
+    /// 玩家输入 攻击按钮   AttackButton 拖拽监听
+    /// </summary>
+    public void Input1()
+    {
+        HeroChoise.Attacker = HeroToManage[0].name;
+        HeroChoise.AttackersGameObject = HeroToManage[0];
+        HeroChoise.Type = "Hero";
+        AttackPanel.SetActive(false);
+        EnemySelectPanel.SetActive(true);
+    }
+
+
+    public void Input2(GameObject choosenEnemy)
+    {
+        HeroChoise.AttackersTarget = choosenEnemy;
+        HeroInput = HeroGUI.DONE;
+    }
+
+    /// <summary>
+    /// 玩家输入完毕后
+    /// </summary>
+    private void HeroInputDone()
+    {
+        PerformList.Add(HeroChoise);
+        EnemySelectPanel.SetActive(false);
+        HeroToManage[0].transform.Find("Selector").gameObject.SetActive(false);
+        HeroToManage.RemoveAt(0);
+        HeroInput = HeroGUI.ACTIOVATE;
     }
 }

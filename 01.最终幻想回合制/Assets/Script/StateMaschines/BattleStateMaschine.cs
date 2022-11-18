@@ -94,6 +94,12 @@ public class BattleStateMaschine : MonoBehaviour
 
 
 
+    private void Awake()
+    {
+        GameObject.Find("AttackButton").transform.GetComponent<Button>().onClick.AddListener(Input1);
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -190,7 +196,7 @@ public class BattleStateMaschine : MonoBehaviour
             EnemySelectButton button = newButton.GetComponent<EnemySelectButton>();
             EnemyStateMaschine cur_enemy = enemy.GetComponent<EnemyStateMaschine>();
             Text buttontext = newButton.transform.Find("Text").GetComponent<Text>();
-            buttontext.text = cur_enemy.enemy.name;
+            buttontext.text = cur_enemy.enemy.theName;
             button.EnemyPrefab = enemy;
         }
     }

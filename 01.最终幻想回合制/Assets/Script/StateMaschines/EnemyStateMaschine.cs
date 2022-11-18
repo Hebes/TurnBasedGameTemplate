@@ -32,8 +32,13 @@ public class EnemyStateMaschine : MonoBehaviour
     }
 
     public TurnState currentState;
-    public float cur_colldown = 0f;
-    public float max_colldown = 5f;
+    private float cur_colldown = 0f;
+    private float max_colldown = 5f;
+
+    /// <summary>
+    /// 选择器物体 就是角色头上顶的黄色小物体
+    /// </summary>
+    public GameObject Selector;
 
     /// <summary>
     /// 这个物体的初始位置
@@ -53,6 +58,7 @@ public class EnemyStateMaschine : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Selector.SetActive(false);
         currentState = TurnState.PROCESSING;
         BSM = GameObject.Find("BattleManager").GetComponent<BattleStateMaschine>();
         startPosition = transform.position;
@@ -61,7 +67,7 @@ public class EnemyStateMaschine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("敌人显示当前状态:" + currentState);
+        //Debug.Log("敌人显示当前状态:" + currentState);
         switch (currentState)
         {
             case TurnState.PROCESSING:
@@ -102,11 +108,17 @@ public class EnemyStateMaschine : MonoBehaviour
     private void ChooseAction()
     {
         HandleTurn myAttack = new HandleTurn();
-        Debug.Log(enemy.name);
-        myAttack.Attacker = enemy.name;
+        //Debug.Log(enemy.theName);
+        myAttack.Attacker = enemy.theName;
         myAttack.Type = "Enemy";
         myAttack.AttackersGameObject = this.gameObject;
         myAttack.AttackersTarget = BSM.HerosInBattle[Random.Range(0, BSM.HerosInBattle.Count)];
+        //选择攻击方式
+        int num = Random.Range(0, enemy.attacks.Count);
+        myAttack.choosenAttack = enemy.attacks[num];
+        //伤害公式=emeny的enemy.curAtk+选择攻击方式的一种的伤害-对方的防御
+        Debug.Log(this.gameObject.name + "选择了：" + myAttack.choosenAttack.attackName + "攻击方式,对" + myAttack.AttackersTarget.name + "造成" + (myAttack.choosenAttack.attackDamage + enemy.curAtk) + "伤害");
+
         BSM.CollectActions(myAttack);
     }
 
@@ -132,6 +144,7 @@ public class EnemyStateMaschine : MonoBehaviour
         //等待
         yield return new WaitForSeconds(0.5f);
         //伤害
+        DoDamage();
         //回到起始位置的动画
         Vector3 firstPosition = startPosition;
         while (MoveTowrdsStart(firstPosition))//循环等待1帧
@@ -165,5 +178,14 @@ public class EnemyStateMaschine : MonoBehaviour
     private bool MoveTowrdsStart(Vector3 target)
     {
         return target != (transform.position = Vector3.MoveTowards(transform.position, target, animSpeed * Time.deltaTime));
+    }
+
+    /// <summary>
+    /// 给与伤害
+    /// </summary>
+    private void DoDamage()
+    {
+        float calc_damage = enemy.curAtk + BSM.PerformList[0].choosenAttack.attackDamage;
+        HeroToAttAck.GetComponent<HeroStateMaschine>().TakeDamage(calc_damage);
     }
 }

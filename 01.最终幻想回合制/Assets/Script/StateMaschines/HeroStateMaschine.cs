@@ -4,51 +4,54 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// Ó¢ĞÛ×´Ì¬»ú
+/// è‹±é›„çŠ¶æ€æœº
 /// </summary>
 public class HeroStateMaschine : MonoBehaviour
 {
     private BattleStateMaschine BSM;
-    public BaseHero baseHero;
+    public BaseHero hero;
 
     public enum TurnState
     {
         /// <summary>
-        /// ½ø¶ÈÌõÉÏÉı
+        /// è¿›åº¦æ¡ä¸Šå‡
         /// </summary>
         PROCESSING,
         /// <summary>
-        /// Ìí¼Óµ½ÁĞ±íÖĞ
+        /// æ·»åŠ åˆ°åˆ—è¡¨ä¸­
         /// </summary>
         ADDTOLIST,
         /// <summary>
-        /// µÈ´ı
+        /// ç­‰å¾…
         /// </summary>
         WAITING,
         /// <summary>
-        /// Ñ¡Ôñ
+        /// é€‰æ‹©
         /// </summary>
         SELECTING,
         /// <summary>
-        /// ĞĞ¶¯
+        /// è¡ŒåŠ¨
         /// </summary>
         ACTION,
         /// <summary>
-        /// ËÀÈ¥µÄ
+        /// æ­»å»çš„
         /// </summary>
         DEAD,
     }
 
     public TurnState currentState;
-    public float cur_colldown = 0f;
-    public float max_colldown = 5f;
+    private float cur_colldown = 0f;
+    private float max_colldown = 5f;
     /// <summary>
-    /// ÀäÈ´°æ½ø¶ÈÌõ
+    /// å†·å´ç‰ˆè¿›åº¦æ¡
     /// </summary>
     public Image ProgressBar;
+    /// <summary>
+    /// é€‰æ‹©å™¨ç‰©ä½“ å°±æ˜¯è§’è‰²å¤´ä¸Šé¡¶çš„é»„è‰²å°ç‰©ä½“
+    /// </summary>
     public GameObject Selector;
 
-    //Ó¢ĞÛ»ØÌø
+    //è‹±é›„å›è·³
     public GameObject EnemyToAttack;
     private bool actionStarted = false;
     public Vector3 startPosition;
@@ -67,7 +70,7 @@ public class HeroStateMaschine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Ó¢ĞÛÏÔÊ¾µ±Ç°×´Ì¬:" + currentState);
+        //Debug.Log("è‹±é›„æ˜¾ç¤ºå½“å‰çŠ¶æ€:" + currentState);
         switch (currentState)
         {
             case TurnState.PROCESSING:
@@ -78,7 +81,7 @@ public class HeroStateMaschine : MonoBehaviour
                 currentState = TurnState.WAITING;
                 break;
             case TurnState.WAITING:
-                //¿ÕÏĞ×´Ì¬
+                //ç©ºé—²çŠ¶æ€
                 break;
             case TurnState.SELECTING:
                 break;
@@ -93,62 +96,62 @@ public class HeroStateMaschine : MonoBehaviour
     }
 
     /// <summary>
-    /// Éı¼¶½ø¶ÈÌõ  ÀäÈ´°æ
+    /// å‡çº§è¿›åº¦æ¡  å†·å´ç‰ˆ
     /// </summary>
     void UpgradeProgressBar()
     {
         cur_colldown = cur_colldown + Time.deltaTime;
         float calc_cooldown = cur_colldown / max_colldown;
-        // ½«¸ø¶¨ÖµÏŞÖÆÔÚ¸ø¶¨µÄ×îĞ¡¸¡µãÖµºÍ×î´ó¸¡µãÖµÖ®¼ä¡£
-        // Èç¹û¸ø¶¨ÖµÔÚ×îĞ¡ÖµºÍ×î´óÖµ·¶Î§ÄÚ£¬Ôò·µ»Ø¸ø¶¨Öµ¡£
+        // å°†ç»™å®šå€¼é™åˆ¶åœ¨ç»™å®šçš„æœ€å°æµ®ç‚¹å€¼å’Œæœ€å¤§æµ®ç‚¹å€¼ä¹‹é—´ã€‚
+        // å¦‚æœç»™å®šå€¼åœ¨æœ€å°å€¼å’Œæœ€å¤§å€¼èŒƒå›´å†…ï¼Œåˆ™è¿”å›ç»™å®šå€¼ã€‚
         ProgressBar.transform.localScale = new Vector3(
             Mathf.Clamp(calc_cooldown, 0, 1),
             ProgressBar.transform.localScale.y,
             ProgressBar.transform.localScale.z);
-        if (cur_colldown >= max_colldown)//Èç¹ûÀäÈ´Ê±¼äµ½ÁË
+        if (cur_colldown >= max_colldown)//å¦‚æœå†·å´æ—¶é—´åˆ°äº†
         {
             currentState = TurnState.ADDTOLIST;
         }
     }
 
     /// <summary>
-    /// ĞĞ¶¯µÄÊ±¼äµ½ÁË
+    /// è¡ŒåŠ¨çš„æ—¶é—´åˆ°äº†
     /// </summary>
     /// <returns></returns>
     private IEnumerator TimeForAction()
     {
         if (actionStarted)
         {
-            yield break;//Èç¹ûÃ»µ½¿ÉÒÔĞĞ¶¯,Ö±½ÓÌø³öĞ­³Ì
+            yield break;//å¦‚æœæ²¡åˆ°å¯ä»¥è¡ŒåŠ¨,ç›´æ¥è·³å‡ºåç¨‹
         }
         actionStarted = true;
-        //²¥·ÅµĞÈË½Ó½üÓ¢ĞÛµÄ¹¥»÷¶¯»­
+        //æ’­æ”¾æ•Œäººæ¥è¿‘è‹±é›„çš„æ”»å‡»åŠ¨ç”»
         Vector3 enemyPostion = new Vector3(
             EnemyToAttack.transform.position.x + 1.5f,
             EnemyToAttack.transform.position.y,
             EnemyToAttack.transform.position.z);
-        while (MoveTowrdsEnemy(enemyPostion))//Ñ­»·µÈ´ı1Ö¡
-            yield return null;//Õâ¸öÊÇµÈ´ı1Ö¡µÄÒâË¼
-        //µÈ´ı
+        while (MoveTowrdsEnemy(enemyPostion))//å¾ªç¯ç­‰å¾…1å¸§
+            yield return null;//è¿™ä¸ªæ˜¯ç­‰å¾…1å¸§çš„æ„æ€
+        //ç­‰å¾…
         yield return new WaitForSeconds(0.5f);
-        //ÉËº¦
-        //»Øµ½ÆğÊ¼Î»ÖÃµÄ¶¯»­
+        //ä¼¤å®³
+        //å›åˆ°èµ·å§‹ä½ç½®çš„åŠ¨ç”»
         Vector3 firstPosition = startPosition;
-        while (MoveTowrdsStart(firstPosition))//Ñ­»·µÈ´ı1Ö¡
-            yield return null;//Õâ¸öÊÇµÈ´ı1Ö¡µÄÒâË¼
-        //´ÓBSMµÄPerformerÁĞ±íÒÆ³ı
+        while (MoveTowrdsStart(firstPosition))//å¾ªç¯ç­‰å¾…1å¸§
+            yield return null;//è¿™ä¸ªæ˜¯ç­‰å¾…1å¸§çš„æ„æ€
+        //ä»BSMçš„Performeråˆ—è¡¨ç§»é™¤
         BSM.PerformList.RemoveAt(0);
-        //ÖØÖÃBSM->µÈ´ı
+        //é‡ç½®BSM->ç­‰å¾…
         BSM.battleState = BattleStateMaschine.PerfromAction.WAIT;
-        //½áÊøĞ­³Ì
+        //ç»“æŸåç¨‹
         actionStarted = false;
-        //ÖØÖÃµĞÈË×´Ì¬
+        //é‡ç½®æ•ŒäººçŠ¶æ€
         cur_colldown = 0f;
         currentState = TurnState.PROCESSING;
     }
 
     /// <summary>
-    /// ÒÆ¶¯µĞÈË Èç¹ûµĞÈËÃ»ÒÆ¶¯µ½Íæ¼Ò×ø±êµÄÊ±ºò  ·µ»ØµÄ¾ÍÊÇfalse
+    /// ç§»åŠ¨æ•Œäºº å¦‚æœæ•Œäººæ²¡ç§»åŠ¨åˆ°ç©å®¶åæ ‡çš„æ—¶å€™  è¿”å›çš„å°±æ˜¯false
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
@@ -158,12 +161,25 @@ public class HeroStateMaschine : MonoBehaviour
     }
 
     /// <summary>
-    /// »Øµ½Ô­À´µÄÎ»ÖÃ
+    /// å›åˆ°åŸæ¥çš„ä½ç½®
     /// </summary>
     /// <param name="target"></param>
     /// <returns></returns>
     private bool MoveTowrdsStart(Vector3 target)
     {
         return target != (transform.position = Vector3.MoveTowards(transform.position, target, animSpeed * Time.deltaTime));
+    }
+
+    /// <summary>
+    /// é­å—ä¼¤å®³
+    /// </summary>
+    public void TakeDamage(float getDamageAmount)
+    {
+        hero.curHP -= getDamageAmount;
+        Debug.Log(hero.theName + "å—åˆ°ï¼š" + getDamageAmount + "ç‚¹ä¼¤å®³,å‰©ä½™ç”Ÿå‘½å€¼ï¼š" + hero.curHP);
+        if (hero.curHP <= 0)
+        {
+            currentState = TurnState.DEAD;
+        }
     }
 }

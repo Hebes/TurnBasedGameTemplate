@@ -132,8 +132,23 @@ public class BattleStateMaschine : MonoBehaviour
                 if (PerformList[0].Type.Equals("Enemy"))
                 {
                     EnemyStateMaschine ESM = performer.GetComponent<EnemyStateMaschine>();
-                    ESM.HeroToAttAck = PerformList[0].AttackersTarget;
-                    ESM.currentState = EnemyStateMaschine.TurnState.ACTION;
+                    //攻击前检查被攻击的英雄是否在列表中
+                    for (int i = 0; i < HerosInBattle.Count; i++)
+                    {
+                        //存在的话
+                        if (PerformList[0].AttackersTarget== HerosInBattle[i])
+                        {
+                            ESM.HeroToAttAck = PerformList[0].AttackersTarget;
+                            ESM.currentState = EnemyStateMaschine.TurnState.ACTION;
+                            break;
+                        }
+                        else
+                        {
+                            PerformList[0].AttackersTarget = HerosInBattle[Random.Range(0, HerosInBattle.Count)];
+                            ESM.HeroToAttAck = PerformList[0].AttackersTarget;
+                            ESM.currentState = EnemyStateMaschine.TurnState.ACTION;
+                        }
+                    }
                 }
                 if (PerformList[0].Type.Equals("Hero"))
                 {

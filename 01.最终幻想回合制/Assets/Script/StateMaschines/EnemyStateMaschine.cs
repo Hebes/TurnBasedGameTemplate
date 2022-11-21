@@ -32,8 +32,13 @@ public class EnemyStateMaschine : MonoBehaviour
     }
 
     public TurnState currentState;
-    public float cur_colldown = 0f;
-    public float max_colldown = 5f;
+    private float cur_colldown = 0f;
+    private float max_colldown = 5f;
+
+    /// <summary>
+    /// 选择器物体 就是角色头上顶的黄色小物体
+    /// </summary>
+    public GameObject Selector;
 
     /// <summary>
     /// 这个物体的初始位置
@@ -50,9 +55,16 @@ public class EnemyStateMaschine : MonoBehaviour
     public GameObject HeroToAttAck;
     private float animSpeed = 5f;
 
+    /// <summary>
+    /// dead 是否存活
+    /// </summary>
+    private bool alive = true;
+
+
     // Start is called before the first frame update
     void Start()
     {
+        Selector.SetActive(false);
         currentState = TurnState.PROCESSING;
         BSM = GameObject.Find("BattleManager").GetComponent<BattleStateMaschine>();
         startPosition = transform.position;
@@ -61,7 +73,7 @@ public class EnemyStateMaschine : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("敌人显示当前状态:" + currentState);
+        //Debug.Log("敌人显示当前状态:" + currentState);
         switch (currentState)
         {
             case TurnState.PROCESSING:
@@ -78,6 +90,42 @@ public class EnemyStateMaschine : MonoBehaviour
                 StartCoroutine(TimeForAction());
                 break;
             case TurnState.DEAD:
+                if (!alive)
+                    return;
+                else
+                {
+                    //change tag 切换标签
+                    this.gameObject.tag = "DeadEnemy";
+                    //not attackable by enemy 不能被敌人攻击 从BattleStateMaschine 英雄战斗列表删除自己
+                    BSM.EnemysInBattle.Remove(this.gameObject);
+                    //deactivate the selector 停用选择器 就是黄色的小物体
+                    Selector.SetActive(false);
+                    //remove item from performlist 
+                    if (BSM.EnemysInBattle.Count > 0)
+                    {
+
+                        for (int i = 0; i < BSM.PerformList.Count; i++)
+                        {
+                            if (i != 0)
+                            {
+                                //如果被攻击的是这个已经死亡的角色
+                                if (BSM.PerformList[i].AttackersTarget == this.gameObject)
+                                    BSM.PerformList[i].AttackersTarget = BSM.EnemysInBattle[Random.Range(0, BSM.EnemysInBattle.Count)];
+                                //从执行列表中删除项目
+                                if (BSM.PerformList[i].AttackersGameObject == this.gameObject)
+                                    BSM.PerformList.Remove(BSM.PerformList[i]);
+                            }
+                        }
+                    }
+                    //change color / play animation 改变颜色/播放动画
+                    this.gameObject.GetComponent<MeshRenderer>().material.color = new Color32(105, 105, 105, 255);
+                    //设置为不存活
+                    alive = false;
+                    //重新生成敌人的按钮
+                    BSM.EnemyButtons();
+                    //check alive 检查是否存活
+                    BSM.battleStates = BattleStateMaschine.PerformAction.CHECKALIVE;
+                }
                 break;
             default:
                 break;
@@ -102,11 +150,17 @@ public class EnemyStateMaschine : MonoBehaviour
     private void ChooseAction()
     {
         HandleTurn myAttack = new HandleTurn();
-        Debug.Log(enemy.name);
-        myAttack.Attacker = enemy.name;
+        //Debug.Log(enemy.theName);
+        myAttack.Attacker = enemy.theName;
         myAttack.Type = "Enemy";
         myAttack.AttackersGameObject = this.gameObject;
         myAttack.AttackersTarget = BSM.HerosInBattle[Random.Range(0, BSM.HerosInBattle.Count)];
+        //选择攻击方式
+        int num = Random.Range(0, enemy.attacks.Count);
+        myAttack.choosenAttack = enemy.attacks[num];
+        //伤害公式=emeny的enemy.curAtk+选择攻击方式的一种的伤害-对方的防御
+        //Debug.Log(this.gameObject.name + "选择了：" + myAttack.choosenAttack.attackName + "攻击方式,对" + myAttack.AttackersTarget.name + "造成" + (myAttack.choosenAttack.attackDamage + enemy.curAtk) + "伤害");
+
         BSM.CollectActions(myAttack);
     }
 
@@ -132,6 +186,7 @@ public class EnemyStateMaschine : MonoBehaviour
         //等待
         yield return new WaitForSeconds(0.5f);
         //伤害
+        DoDamage();
         //回到起始位置的动画
         Vector3 firstPosition = startPosition;
         while (MoveTowrdsStart(firstPosition))//循环等待1帧
@@ -139,7 +194,7 @@ public class EnemyStateMaschine : MonoBehaviour
         //从BSM的Performer列表移除
         BSM.PerformList.RemoveAt(0);
         //重置BSM->等待
-        BSM.battleState = BattleStateMaschine.PerfromAction.WAIT;
+        BSM.battleStates = BattleStateMaschine.PerformAction.WAIT;
         //结束协程
         actionStarted = false;
         //重置敌人状态
@@ -166,4 +221,28 @@ public class EnemyStateMaschine : MonoBehaviour
     {
         return target != (transform.position = Vector3.MoveTowards(transform.position, target, animSpeed * Time.deltaTime));
     }
+
+    /// <summary>
+    /// 遭受伤害
+    /// </summary>
+    public void TakeDamage(float getDamageAmount)
+    {
+
+        enemy.curHP -= getDamageAmount;
+        if (enemy.curHP <= 0)
+        {
+            enemy.curHP = 0;
+            currentState = TurnState.DEAD;
+        }
+    }
+
+    /// <summary>
+    /// 给与伤害
+    /// </summary>
+    private void DoDamage()
+    {
+        float calc_damage = enemy.curAtk + BSM.PerformList[0].choosenAttack.attackDamage;
+        HeroToAttAck.GetComponent<HeroStateMaschine>().TakeDamage(calc_damage);
+    }
+
 }

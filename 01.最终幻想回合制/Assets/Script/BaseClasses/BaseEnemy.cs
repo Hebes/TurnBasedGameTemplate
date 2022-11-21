@@ -4,9 +4,8 @@ using UnityEngine;
 using System;
 
 [Serializable]
-public class BaseEnemy
+public class BaseEnemy : BaseClass
 {
-    public string name;
 
     public enum EType
     {
@@ -27,14 +26,5 @@ public class BaseEnemy
     public EType EnemyType;
     public ERarity rarity;
 
-    public float baseHP;
-    public float curHP;
 
-    public float BaseMP;
-    public float curMP;
-
-    public float baeATK;
-    public float curAtk;
-    public float baseDEF;
-    public float surDEF;
 }

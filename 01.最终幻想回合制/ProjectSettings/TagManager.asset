@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Hero
   - Enemy
+  - DeadHero
+  - DeadEnemy
+  - region1
+  - region2
+  - teleporter
   layers:
   - Default
   - TransparentFX
